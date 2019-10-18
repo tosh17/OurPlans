@@ -13,7 +13,7 @@ class UserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
                 floatingActionButton.setOnClickListener { floatingActionButton.hide() }
-      //  setSupportActionBar(bottom_app_bar)
+       //setSupportActionBar(bottom_app_bar)
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater

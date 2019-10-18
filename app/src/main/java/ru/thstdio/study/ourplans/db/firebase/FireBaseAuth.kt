@@ -1,5 +1,6 @@
 package ru.thstdio.study.ourplans.db.firebase
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -9,15 +10,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import io.reactivex.subjects.PublishSubject
 import ru.thstdio.study.ourplans.R
+import ru.thstdio.study.ourplans.db.repo.Repo.Companion.USER_STATUS_NOT_AUTH
 
-class FireBaseAuth(val store:FireBaseCloud) {
+
+class FireBaseAuth(val store: FireBaseCloud) {
     //Google Sign In Client
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     //Firebase Auth
     private lateinit var mAuth: FirebaseAuth
+    var userAuthStatus = PublishSubject.create<Int>()
 
     fun init(context: Context) {
         mAuth = FirebaseAuth.getInstance()
@@ -29,14 +33,22 @@ class FireBaseAuth(val store:FireBaseCloud) {
 
     }
 
-    fun getCurrentUser() = mAuth.currentUser
+    fun checkIsUserLogin() {
+        mAuth.currentUser?.let {
+            store.loadUser(it, userAuthStatus)
+        } ?: let {
+            userAuthStatus.onNext(USER_STATUS_NOT_AUTH)
+        }
+    }
+
+
     fun getSignInIntent() = mGoogleSignInClient.signInIntent
-    fun onActivityResult(data: Intent,upDateUI: (FirebaseUser) -> Unit) {
+    fun onActivityResult(data: Intent) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(data)
         try {
             // Google Sign In was successful, authenticate with Firebase
             val account = task.getResult(ApiException::class.java)
-            account?.let { firebaseAuthWithGoogle(account,upDateUI) }
+            account?.let { firebaseAuthWithGoogle(account) }
         } catch (e: ApiException) {
             // Google Sign In failed, update UI appropriately
             Log.w("Login", "Google sign in failed", e)
@@ -44,34 +56,24 @@ class FireBaseAuth(val store:FireBaseCloud) {
         }
     }
 
-    private fun firebaseAuthWithGoogle(
-        acct: GoogleSignInAccount,
-        upDateUI: (FirebaseUser) -> Unit
-    ) {
-        Log.d("Login", "firebaseAuthWithGoogle:" + acct.id!!)
-
+    @SuppressLint("CheckResult")
+    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+
         mAuth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d("Login", "signInWithCredential:success")
                     val user = mAuth.currentUser
                     user?.let {
-                        // loadUser(user)
-                        store.createUser(user)
-                        upDateUI.invoke(user)
+                        store.loadUser(user,userAuthStatus)
                     }
 
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("Login", "signInWithCredential:failure", task.exception)
-                    //todo error
-                   // onUpdateUI.invoke(null)
-                }
 
-                // ...
+                }
             }
     }
-
 }

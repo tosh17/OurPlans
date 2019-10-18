@@ -1,18 +1,20 @@
 package ru.thstdio.study.ourplans
 
 import android.app.Application
-import ru.thstdio.study.ourplans.di.component.AppComponent
-import ru.thstdio.study.ourplans.di.component.DaggerAppComponent
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import ru.thstdio.study.ourplans.di.koin.firebaseModule
+import ru.thstdio.study.ourplans.di.koin.repoModule
 
 class App: Application() {
 
-    companion object {
-        lateinit var daggerComponent: AppComponent private set
-
-    }
-
     override fun onCreate() {
         super.onCreate()
-        daggerComponent = DaggerAppComponent.builder().setContext(this).build()
+        startKoin{
+            androidContext(this@App)
+            // modules
+            modules(listOf(firebaseModule, repoModule))
+        }
+
     }
 }

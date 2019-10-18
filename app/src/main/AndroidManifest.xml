@@ -14,7 +14,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".ui.UserActivity"></activity>
         <activity
-            android:name=".MainActivity"
+            android:name="ru.thstdio.study.ourplans.ui.login.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
             <intent-filter>

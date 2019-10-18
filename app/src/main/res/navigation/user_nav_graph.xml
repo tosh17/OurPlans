@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/user_nav_graph"
+    app:startDestination="@id/listPlansFragment">
+
+    <fragment
+        android:id="@+id/listPlansFragment"
+        android:name="ru.thstdio.study.ourplans.ui.listplans.ui.ListPlansFragment"
+        android:label="ListPlansFragment"
+        tools:layout="@layout/list_plan_fragment"/>
+</navigation>
