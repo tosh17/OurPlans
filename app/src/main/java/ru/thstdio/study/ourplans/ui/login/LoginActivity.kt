@@ -7,14 +7,13 @@ import android.view.View
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 import android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 import androidx.appcompat.app.AppCompatActivity
-import io.reactivex.Single
+
 import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.login_motion_layout.*
 import kotlinx.android.synthetic.main.main_no_login_user.*
 import org.koin.android.ext.android.inject
 import ru.thstdio.study.ourplans.R
 import ru.thstdio.study.ourplans.db.firebase.FireBaseAuth
-import ru.thstdio.study.ourplans.db.repo.Repo
 import ru.thstdio.study.ourplans.db.repo.Repo.Companion.USER_STATUS_NOT_AUTH
 import ru.thstdio.study.ourplans.ui.UserActivity
 
@@ -27,11 +26,12 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.login_motion_layout)
         window.decorView.systemUiVisibility =
             SYSTEM_UI_FLAG_LAYOUT_STABLE or SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         listenerFBUser()
         firebaseAuth.checkIsUserLogin()
+        button_sing.setOnClickListener { signIn() }
       }
 
     @SuppressLint("CheckResult")
@@ -68,13 +68,10 @@ class LoginActivity : AppCompatActivity() {
                 UserActivity::class.java
             )
         )
+        finish()
     }
 
     private fun showAuthView() {
-        cardView.visibility = View.VISIBLE
-        viewStub_not_login?.let {
-            it.inflate()
-            sign_in_button.setOnClickListener { signIn() }
-        }
+        motionLayout.transitionToEnd()
     }
 }

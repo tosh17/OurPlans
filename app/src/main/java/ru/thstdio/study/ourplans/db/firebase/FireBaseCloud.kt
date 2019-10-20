@@ -63,9 +63,13 @@ class FireBaseCloud(val repo: Repo) {
 
             }
     }
-
+    fun getCollection(category:String)=when(category){
+        "users"-> db.collection("users")
+        "active"-> db.collection("personalplan").document(repo.user.id).collection("active")
+        else -> throw Error("No Collection")
+    }
     fun loadPersonList(listPlans: PublishSubject<List<Plans>>) {
-        val docRef = db.collection("personalplan").document(repo.user.id).collection("active")
+        val docRef =  getCollection("active")
             .addSnapshotListener { value, e ->
                 if (e != null) {
                     Log.w("TEST", "Listen failed.", e)
@@ -77,6 +81,17 @@ class FireBaseCloud(val repo: Repo) {
                     plans.add(doc.toObject(Plans::class.java))
                 }
                 listPlans.onNext(plans)
+            }
+
+    }
+
+    fun createPersonalPlans(plan:Plans){
+          getCollection("active").document(plan.id)
+            .set(plan)
+            .addOnSuccessListener { documentReference ->
+               }
+            .addOnFailureListener { e ->
+                //    Log.w(TAG, "Error adding document", e)
             }
 
     }
